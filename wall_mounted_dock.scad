@@ -1,14 +1,14 @@
 // All measurements in mm
-width = 60;
-height = 80;
-thickness = 10;
-padding = 2.5;
-front_bevel_thickness = 1;
+width = 80;
+height = 100;
+thickness = 20;
+padding = 5;
+front_bevel_thickness = 4;
 
-coord_width = 2;
-coord_connector_width = 5;
-coord_connector_height = 6;
-coord_connector_thickness = 3;
+coord_width = 7;
+coord_connector_width = 15;
+coord_connector_height = 12;
+coord_connector_thickness = 8;
 
 letter_indent_amount = 3/4 * front_bevel_thickness;
 left_letter = "R";
@@ -45,9 +45,9 @@ module front_bevel (bevel_thickness=1) {
 
 module front_bevels (bevel_thickness=1) {
     translate([padding, padding, thickness + 2 * padding])
-        front_bevel(1);
+        front_bevel(bevel_thickness);
     translate([width * 3/4 + 2 * padding, padding, thickness + 2 * padding])
-        front_bevel(1);
+        front_bevel(bevel_thickness);
     
     translate([padding, padding, thickness + 2 * padding])
         linear_extrude(height=bevel_thickness) 
@@ -55,8 +55,8 @@ module front_bevels (bevel_thickness=1) {
 }
 
 module back_cutaway(offset=0) {
-    half_dock = width/2 - 2 * padding - coord_connector_width/2;
-    translate([offset + half_dock/2 + 2 * padding, 0, -0.001])
+    half_dock = width/2 - coord_connector_width/2 - padding/2;
+    translate([offset + half_dock/2 + padding, 0, -0.001])
     linear_extrude(height=thickness)
         circle(d=half_dock);
 }
@@ -68,7 +68,7 @@ module dock_outer_hull () {
         color("orange")
             back_cutaway();
         color("orange")
-            back_cutaway(offset=width/2 + padding);
+            back_cutaway(offset=width/2 + 3/2 * padding);
     }
     color("darkorange")
         front_bevels(front_bevel_thickness);
@@ -110,16 +110,22 @@ module add_line(xOffset=0, yOffset=0, rotation=0, length=height/5) {
 }
 
 module add_lines () {
-    add_line(yOffset=height/2, length=height/8);
-    add_line();
+    line_width = padding/2;
+    
+    top_line_height = height/8 + padding;
+    top_line_yOffset = height/2 - padding;
+    
+    bottom_line_height = height/4 + line_width;
+    
+    add_line(yOffset=top_line_yOffset, length=top_line_height);
+    add_line(length=bottom_line_height);
     bottom_line_length = width/4;
     add_line(xOffset = bottom_line_length, rotation=90, length=bottom_line_length);
     
-    line_width = padding/2;
     right_side_start = width * 7/8 - (width/4 - 2 * padding)/2;
     
-    add_line(xOffset=right_side_start, yOffset=height/2, length=height/8);
-    add_line(xOffset=right_side_start);
+    add_line(xOffset=right_side_start, yOffset=top_line_yOffset, length=top_line_height);
+    add_line(xOffset=right_side_start, length=bottom_line_height);
     add_line(xOffset=right_side_start + padding/2, rotation=90, length=bottom_line_length);
 }
 
