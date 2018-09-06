@@ -133,6 +133,10 @@ difference() {
         dock_outer_hull();
         color("orange")
             charging_port();
+        color("orange")
+            translate([width/2 - coord_width/2, padding - 0.001, thickness + 2 * padding + 0.001])
+                linear_extrude(height=front_bevel_thickness) 
+                    square([2 * padding + coord_width, width * 1/4 - 2 * padding + 0.002]);
     }
     
     add_letters();
