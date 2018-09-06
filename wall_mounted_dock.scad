@@ -96,15 +96,47 @@ module make_letter(letter) {
             text(letter, size = width/4 - 2 * padding, font = "Liberation Sans", valign = "center", $fn = 16);
 }
 
-letter_start_height = thickness + 2 * padding + front_bevel_thickness - letter_indent_amount + 0.001;
+module add_letters() {
+    letter_start_height = thickness + 2 * padding + front_bevel_thickness - letter_indent_amount + 0.001;
+    
+    translate([3/2 * padding, height/2, letter_start_height])
+        make_letter(left_letter);
+    translate([5/2 * padding + 3/4 * width, height/2, letter_start_height])
+        make_letter(right_letter);
+}
+
+module add_line(xOffset=0, yOffset=0, rotation=0, length=height/5) {
+    line_start_height = thickness + 2 * padding + front_bevel_thickness - letter_indent_amount + 0.001;
+    line_width = padding/2;
+    translate([xOffset + width/8 + line_width/2, yOffset + (height/4 - 2 * padding)/2 + padding + line_width/2, line_start_height])
+    linear_extrude(height=letter_indent_amount)
+        rotate([0, 0, rotation])
+        square([line_width, length]);
+}
+
+module add_lines () {
+    add_line(yOffset=height/2, length=height/8);
+    add_line();
+    bottom_line_length = height/3 + padding;
+    add_line(xOffset = bottom_line_length, rotation=90, length=bottom_line_length);
+    
+    
+    right_side_start = width * 7/8 - padding * 2;
+    
+    add_line(xOffset=right_side_start, yOffset=height/2, length=height/8);
+    add_line(xOffset=right_side_start);
+    add_line(xOffset=right_side_start + padding/2, rotation=90, length=bottom_line_length);
+}
+
 difference() {
     difference() {
         dock_outer_hull();
         color("orange")
             charging_port();
     }
-    translate([3/2 * padding, height/2, letter_start_height])
-        make_letter(left_letter);
-    translate([5/2 * padding + 3/4 * width, height/2, letter_start_height])
-        make_letter(right_letter);
+    
+    add_letters();
+    
+    color("red")
+        add_lines();
 }
