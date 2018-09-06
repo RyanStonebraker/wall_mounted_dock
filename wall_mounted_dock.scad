@@ -1,6 +1,6 @@
 // All measurements in mm
 width = 60;
-height = 50;
+height = 80;
 thickness = 10;
 padding = 2.5;
 front_bevel_thickness = 1;
@@ -22,9 +22,9 @@ module basic_mount_outline () {
                     square([width + 2 * padding, height + 2 * padding]);
 
 
-                translate([padding, 1/4 * height + padding, padding])
+                translate([padding, height/5 + 2 * padding, padding])
                 linear_extrude(height=thickness)
-                    square([width, height+padding + 3]);
+                    square([width, height + padding]);
             }
 
             translate([padding, height * 3/4 + 2 * padding, padding])
@@ -32,20 +32,15 @@ module basic_mount_outline () {
                 square([width, height/4 + 2]);
         }
 
-        translate([padding + width/4, 2 * padding + height * 1/5, padding])
-        linear_extrude(height=thickness + padding + 2)
+        translate([padding + width/4, 2 * padding + height/5, padding])
+        linear_extrude(height=thickness + padding + 0.001)
             square([width/2, height * 4/5]);
     }
 }
 
 module front_bevel (bevel_thickness=1) {
-    if (bevel_thickness > 0)
-        linear_extrude(height=bevel_thickness)
-            square([width * 1/4 - padding, height * 4/5 - padding]);
-    else
-        translate([0, 0, bevel_thickness])
-        linear_extrude(height=bevel_thickness*-1 + 0.001)
-            square([width * 1/4 - padding, height * 4/5 - padding]);
+    linear_extrude(height=bevel_thickness)
+        square([width * 1/4 - padding, height * 4/5 - padding]);
 }
 
 module front_bevels (bevel_thickness=1) {
@@ -54,9 +49,9 @@ module front_bevels (bevel_thickness=1) {
     translate([width * 3/4 + 2 * padding, padding, thickness + 2 * padding])
         front_bevel(1);
     
-    translate([width * 1/5, padding, thickness + 2 * padding])
+    translate([padding, padding, thickness + 2 * padding])
         linear_extrude(height=bevel_thickness) 
-            square([height * 4/5, width * 1/4 - 2 * padding]);
+            square([width, height/5]);
 }
 
 module back_cutaway(offset=0) {
@@ -117,11 +112,11 @@ module add_line(xOffset=0, yOffset=0, rotation=0, length=height/5) {
 module add_lines () {
     add_line(yOffset=height/2, length=height/8);
     add_line();
-    bottom_line_length = height/3 + padding;
+    bottom_line_length = width/4;
     add_line(xOffset = bottom_line_length, rotation=90, length=bottom_line_length);
     
-    
-    right_side_start = width * 7/8 - padding * 2;
+    line_width = padding/2;
+    right_side_start = width * 7/8 - (width/4 - 2 * padding)/2;
     
     add_line(xOffset=right_side_start, yOffset=height/2, length=height/8);
     add_line(xOffset=right_side_start);
@@ -136,7 +131,7 @@ difference() {
         color("orange")
             translate([width/2 - coord_width/2, padding - 0.001, thickness + 2 * padding + 0.001])
                 linear_extrude(height=front_bevel_thickness) 
-                    square([2 * padding + coord_width, width * 1/4 - 2 * padding + 0.002]);
+                    square([2 * padding + coord_width, height]);
     }
     
     add_letters();
