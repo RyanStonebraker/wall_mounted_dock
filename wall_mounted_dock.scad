@@ -1,12 +1,18 @@
+// All measurements in mm
 width = 60;
 height = 50;
 thickness = 10;
 padding = 2.5;
 front_bevel_thickness = 1;
+
 coord_width = 2;
 coord_connector_width = 5;
 coord_connector_height = 6;
 coord_connector_thickness = 3;
+
+letter_indent_amount = 3/4 * front_bevel_thickness;
+left_letter = "R";
+right_letter = "S";
 
 module basic_mount_outline () {
     difference() {
@@ -49,7 +55,7 @@ module front_bevels (bevel_thickness=1) {
         front_bevel(1);
     
     translate([width * 1/5, padding, thickness + 2 * padding])
-        linear_extrude(height=bevel_thickness)
+        linear_extrude(height=bevel_thickness) 
             square([height * 4/5, width * 1/4 - 2 * padding]);
 }
 
@@ -62,11 +68,15 @@ module back_cutaway(offset=0) {
 
 module dock_outer_hull () {
     difference() {
-        basic_mount_outline();
-        back_cutaway();
-        back_cutaway(offset=width/2 + padding);
+        color("orange")
+            basic_mount_outline();
+        color("orange")
+            back_cutaway();
+        color("orange")
+            back_cutaway(offset=width/2 + padding);
     }
-    front_bevels(front_bevel_thickness);
+    color("darkorange")
+        front_bevels(front_bevel_thickness);
 }
 
 module charging_port () {
@@ -80,8 +90,21 @@ module charging_port () {
         square([coord_connector_width, 1/4 * height + 0.002]);
 }
 
+module make_letter(letter) {
+    color("red")
+        linear_extrude(height=letter_indent_amount)
+            text(letter, size = width/4 - 2 * padding, font = "Liberation Sans", valign = "center", $fn = 16);
+}
 
+letter_start_height = thickness + 2 * padding + front_bevel_thickness - letter_indent_amount + 0.001;
 difference() {
-    dock_outer_hull();
-    charging_port();
+    difference() {
+        dock_outer_hull();
+        color("orange")
+            charging_port();
+    }
+    translate([3/2 * padding, height/2, letter_start_height])
+        make_letter(left_letter);
+    translate([5/2 * padding + 3/4 * width, height/2, letter_start_height])
+        make_letter(right_letter);
 }
